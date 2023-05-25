@@ -1,0 +1,43 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname CHAR_router
+!
+interface host
+ ip address 14.103.0.2/24
+exit
+!
+interface lo
+ ip address 14.153.0.1/24
+exit
+!
+interface matrix_14
+ ip address 14.0.198.1/24
+exit
+!
+interface port_NASH
+ ip address 14.0.6.1/24
+exit
+!
+interface port_NEWY
+ ip address 14.0.4.2/24
+exit
+!
+interface port_PITT
+ ip address 14.0.5.1/24
+exit
+!
+router ospf
+ ospf router-id 14.153.0.1
+ network 14.0.4.0/24 area 0
+ network 14.0.5.0/24 area 0
+ network 14.0.6.0/24 area 0
+ network 14.0.198.0/24 area 0
+ network 14.103.0.0/24 area 0
+ network 14.153.0.0/24 area 0
+exit
+!
+end

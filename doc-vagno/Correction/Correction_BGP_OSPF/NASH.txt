@@ -1,0 +1,106 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname NASH_router
+!
+ip route 14.0.0.0/8 Null0
+!
+interface ext_16_CHIC
+ ip address 179.0.31.1/24
+exit
+!
+interface host
+ ip address 14.108.0.2/24
+exit
+!
+interface lo
+ ip address 14.158.0.1/24
+exit
+!
+interface measurement_14
+ ip address 14.0.199.1/24
+exit
+!
+interface port_CHAR
+ ip address 14.0.6.2/24
+ ip ospf cost 1
+exit
+!
+interface port_PITT
+ ip address 14.0.9.2/24
+ ip ospf cost 1
+exit
+!
+interface port_STLO
+ ip address 14.0.12.2/24
+ ip ospf cost 1
+exit
+!
+router bgp 14
+ neighbor 14.151.0.1 remote-as 14
+ neighbor 14.151.0.1 update-source lo
+ neighbor 14.152.0.1 remote-as 14
+ neighbor 14.152.0.1 update-source lo
+ neighbor 14.153.0.1 remote-as 14
+ neighbor 14.153.0.1 update-source lo
+ neighbor 14.154.0.1 remote-as 14
+ neighbor 14.154.0.1 update-source lo
+ neighbor 14.155.0.1 remote-as 14
+ neighbor 14.155.0.1 update-source lo
+ neighbor 14.156.0.1 remote-as 14
+ neighbor 14.156.0.1 update-source lo
+ neighbor 14.157.0.1 remote-as 14
+ neighbor 14.157.0.1 update-source lo
+ neighbor 179.0.31.2 remote-as 16
+ !
+ address-family ipv4 unicast
+  network 14.0.0.0/8
+  neighbor 14.151.0.1 next-hop-self
+  neighbor 14.152.0.1 next-hop-self
+  neighbor 14.153.0.1 next-hop-self
+  neighbor 14.154.0.1 next-hop-self
+  neighbor 14.155.0.1 next-hop-self
+  neighbor 14.156.0.1 next-hop-self
+  neighbor 14.157.0.1 next-hop-self
+  neighbor 179.0.31.2 route-map LOCAL_PREF_IN_16 in
+  neighbor 179.0.31.2 route-map LOCAL_PREF_OUT_16 out
+ exit-address-family
+exit
+!
+router ospf
+ ospf router-id 14.158.0.1
+ network 14.0.6.0/24 area 0
+ network 14.0.9.0/24 area 0
+ network 14.0.12.0/24 area 0
+ network 14.0.199.0/24 area 0
+ network 14.108.0.0/24 area 0
+ network 14.158.0.0/24 area 0
+exit
+!
+ip prefix-list OWN_PREFIX seq 5 permit 14.0.0.0/8
+!
+bgp community-list 2 seq 5 permit 14:10
+bgp community-list 2 seq 10 permit 14:20
+bgp community-list 2 seq 15 permit 14:30
+!
+route-map OWN_PREFIX permit 10
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map LOCAL_PREF_IN_16 permit 10
+ set community 14:10
+ set local-preference 100
+exit
+!
+route-map LOCAL_PREF_OUT_16 permit 5
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map LOCAL_PREF_OUT_16 permit 10
+ match community 2
+exit
+!
+end

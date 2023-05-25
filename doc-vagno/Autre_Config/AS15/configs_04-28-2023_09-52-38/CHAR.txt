@@ -1,0 +1,106 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname CHAR_router
+!
+ip route 15.0.0.0/8 Null0
+!
+interface ext_18_DETR
+ ip address 179.0.34.1/24
+exit
+!
+interface host
+ ip address 15.103.0.2/24
+exit
+!
+interface lo
+ ip address 15.153.0.1/24
+exit
+!
+interface matrix_15
+ ip address 15.0.198.1/24
+exit
+!
+interface port_NASH
+ ip address 15.0.6.1/24
+ ip ospf cost 1
+exit
+!
+interface port_NEWY
+ ip address 15.0.4.2/24
+ ip ospf cost 1
+exit
+!
+interface port_PITT
+ ip address 15.0.5.1/24
+ ip ospf cost 1
+exit
+!
+router bgp 15
+ neighbor 15.151.0.1 remote-as 15
+ neighbor 15.151.0.1 update-source lo
+ neighbor 15.152.0.1 remote-as 15
+ neighbor 15.152.0.1 update-source lo
+ neighbor 15.154.0.1 remote-as 15
+ neighbor 15.154.0.1 update-source lo
+ neighbor 15.155.0.1 remote-as 15
+ neighbor 15.155.0.1 update-source lo
+ neighbor 15.156.0.1 remote-as 15
+ neighbor 15.156.0.1 update-source lo
+ neighbor 15.157.0.1 remote-as 15
+ neighbor 15.157.0.1 update-source lo
+ neighbor 15.158.0.1 remote-as 15
+ neighbor 15.158.0.1 update-source lo
+ neighbor 179.0.34.2 remote-as 18
+ !
+ address-family ipv4 unicast
+  network 15.0.0.0/8
+  neighbor 15.151.0.1 next-hop-self
+  neighbor 15.152.0.1 next-hop-self
+  neighbor 15.154.0.1 next-hop-self
+  neighbor 15.155.0.1 next-hop-self
+  neighbor 15.156.0.1 next-hop-self
+  neighbor 15.157.0.1 next-hop-self
+  neighbor 15.158.0.1 next-hop-self
+  neighbor 179.0.34.2 route-map LOCAL_PREF_IN_18 in
+  neighbor 179.0.34.2 route-map LOCAL_PREF_OUT_18 out
+ exit-address-family
+exit
+!
+router ospf
+ ospf router-id 15.153.0.1
+ network 15.0.4.0/24 area 0
+ network 15.0.5.0/24 area 0
+ network 15.0.6.0/24 area 0
+ network 15.0.198.0/24 area 0
+ network 15.103.0.0/24 area 0
+ network 15.153.0.0/24 area 0
+exit
+!
+ip prefix-list OWN_PREFIX seq 5 permit 15.0.0.0/8
+!
+bgp community-list 2 seq 5 permit 15:10
+bgp community-list 2 seq 10 permit 15:20
+bgp community-list 2 seq 15 permit 15:30
+!
+route-map OWN_PREFIX permit 10
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map LOCAL_PREF_IN_18 permit 10
+ set community 15:10
+ set local-preference 100
+exit
+!
+route-map LOCAL_PREF_OUT_18 permit 5
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map LOCAL_PREF_OUT_18 permit 10
+ match community 2
+exit
+!
+end

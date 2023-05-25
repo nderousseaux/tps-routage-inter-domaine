@@ -1,0 +1,95 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname BROO_router
+!
+ip route 15.0.0.0/8 Null0
+!
+interface host
+ ip address 15.101.0.2/24
+exit
+!
+interface ixp_82
+ ip address 180.82.0.15/24
+exit
+!
+interface lo
+ ip address 15.151.0.1/24
+exit
+!
+interface port_DETR
+ ip address 15.0.2.1/24
+ ip ospf cost 1
+exit
+!
+interface port_NEWY
+ ip address 15.0.1.1/24
+ ip ospf cost 1
+exit
+!
+router bgp 15
+ neighbor 15.152.0.1 remote-as 15
+ neighbor 15.152.0.1 update-source lo
+ neighbor 15.153.0.1 remote-as 15
+ neighbor 15.153.0.1 update-source lo
+ neighbor 15.154.0.1 remote-as 15
+ neighbor 15.154.0.1 update-source lo
+ neighbor 15.155.0.1 remote-as 15
+ neighbor 15.155.0.1 update-source lo
+ neighbor 15.156.0.1 remote-as 15
+ neighbor 15.156.0.1 update-source lo
+ neighbor 15.157.0.1 remote-as 15
+ neighbor 15.157.0.1 update-source lo
+ neighbor 15.158.0.1 remote-as 15
+ neighbor 15.158.0.1 update-source lo
+ neighbor 180.82.0.82 remote-as 82
+ !
+ address-family ipv4 unicast
+  network 15.0.0.0/8
+  neighbor 15.152.0.1 next-hop-self
+  neighbor 15.153.0.1 next-hop-self
+  neighbor 15.154.0.1 next-hop-self
+  neighbor 15.155.0.1 next-hop-self
+  neighbor 15.156.0.1 next-hop-self
+  neighbor 15.157.0.1 next-hop-self
+  neighbor 15.158.0.1 next-hop-self
+  neighbor 180.82.0.82 route-map IXP_IN_82 in
+  neighbor 180.82.0.82 route-map IXP_OUT_82 out
+ exit-address-family
+exit
+!
+router ospf
+ ospf router-id 15.151.0.1
+ network 15.0.1.0/24 area 0
+ network 15.0.2.0/24 area 0
+ network 15.101.0.0/24 area 0
+ network 15.151.0.0/24 area 0
+exit
+!
+ip prefix-list OWN_PREFIX seq 5 permit 15.0.0.0/8
+!
+bgp community-list 1 seq 5 permit 15:10
+!
+route-map OWN_PREFIX permit 10
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map IXP_OUT_82 permit 10
+ match ip address prefix-list OWN_PREFIX
+ set community 82:1 82:2 82:3 82:4 82:5 82:6 82:7 82:8 82:9 82:10
+exit
+!
+route-map IXP_OUT_82 permit 20
+ match community 1
+ set community 82:1 82:2 82:3 82:4 82:5 82:6 82:7 82:8 82:9 82:10
+exit
+!
+route-map IXP_IN_82 permit 10
+ set community 15:20
+ set local-preference 50
+exit
+!
+end

@@ -1,0 +1,95 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname BROO_router
+!
+ip route 3.0.0.0/8 Null0
+!
+interface host
+ ip address 3.101.0.2/24
+exit
+!
+interface ixp_81
+ ip address 180.81.0.3/24
+exit
+!
+interface lo
+ ip address 3.151.0.1/24
+exit
+!
+interface port_DETR
+ ip address 3.0.2.1/24
+ ip ospf cost 1
+exit
+!
+interface port_NEWY
+ ip address 3.0.1.1/24
+ ip ospf cost 1
+exit
+!
+router bgp 3
+ neighbor 3.152.0.1 remote-as 3
+ neighbor 3.152.0.1 update-source lo
+ neighbor 3.153.0.1 remote-as 3
+ neighbor 3.153.0.1 update-source lo
+ neighbor 3.154.0.1 remote-as 3
+ neighbor 3.154.0.1 update-source lo
+ neighbor 3.155.0.1 remote-as 3
+ neighbor 3.155.0.1 update-source lo
+ neighbor 3.156.0.1 remote-as 3
+ neighbor 3.156.0.1 update-source lo
+ neighbor 3.157.0.1 remote-as 3
+ neighbor 3.157.0.1 update-source lo
+ neighbor 3.158.0.1 remote-as 3
+ neighbor 3.158.0.1 update-source lo
+ neighbor 180.81.0.81 remote-as 81
+ !
+ address-family ipv4 unicast
+  network 3.0.0.0/8
+  neighbor 3.152.0.1 next-hop-self
+  neighbor 3.153.0.1 next-hop-self
+  neighbor 3.154.0.1 next-hop-self
+  neighbor 3.155.0.1 next-hop-self
+  neighbor 3.156.0.1 next-hop-self
+  neighbor 3.157.0.1 next-hop-self
+  neighbor 3.158.0.1 next-hop-self
+  neighbor 180.81.0.81 route-map IXP_IN_81 in
+  neighbor 180.81.0.81 route-map IXP_OUT_81 out
+ exit-address-family
+exit
+!
+router ospf
+ ospf router-id 3.151.0.1
+ network 3.0.1.0/24 area 0
+ network 3.0.2.0/24 area 0
+ network 3.101.0.0/24 area 0
+ network 3.151.0.0/24 area 0
+exit
+!
+ip prefix-list OWN_PREFIX seq 5 permit 3.0.0.0/8
+!
+bgp community-list 1 seq 5 permit 3:10
+!
+route-map OWN_PREFIX permit 10
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+route-map IXP_OUT_81 permit 10
+ match ip address prefix-list OWN_PREFIX
+ set community 81:11 81:12 81:13 81:14 81:15 81:16 81:17 81:18 81:19 81:20
+exit
+!
+route-map IXP_OUT_81 permit 20
+ match community 1
+ set community 81:11 81:12 81:13 81:14 81:15 81:16 81:17 81:18 81:19 81:20
+exit
+!
+route-map IXP_IN_81 permit 10
+ set community 3:20
+ set local-preference 50
+exit
+!
+end

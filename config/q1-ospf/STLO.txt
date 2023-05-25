@@ -1,0 +1,40 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname STLO_router
+!
+interface host
+ ip address 14.107.0.2/24
+exit
+!
+interface lo
+ ip address 14.157.0.1/24
+exit
+!
+interface port_CHIC
+ ip address 14.0.11.2/24
+exit
+!
+interface port_NASH
+ ip address 14.0.12.1/24
+exit
+!
+interface port_PITT
+ ip address 14.0.8.2/24
+ ip ospf cost 65535
+exit
+!
+router ospf
+ ospf router-id 14.157.0.1
+ network 0.0.0.0/2 area 0
+ network 14.0.8.0/24 area 0
+ network 14.0.11.0/24 area 0
+ network 14.0.12.0/24 area 0
+ network 14.107.0.0/24 area 0
+ network 14.157.0.0/24 area 0
+exit
+!
+end

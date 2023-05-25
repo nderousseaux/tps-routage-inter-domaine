@@ -1,0 +1,9 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname STLO_router
+!
+end

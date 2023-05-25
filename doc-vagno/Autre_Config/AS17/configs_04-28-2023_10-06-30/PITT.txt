@@ -1,0 +1,89 @@
+Building configuration...
+
+Current configuration:
+!
+frr version 8.2.2
+frr defaults traditional
+hostname PITT_router
+!
+ip route 17.0.0.0/8 Null0
+!
+interface host
+ ip address 17.104.0.2/24
+exit
+!
+interface lo
+ ip address 17.154.0.1/24
+exit
+!
+interface port_CHAR
+ ip address 17.0.5.2/24
+ ip ospf cost 1
+exit
+!
+interface port_DETR
+ ip address 17.0.7.1/24
+ ip ospf cost 1
+exit
+!
+interface port_NASH
+ ip address 17.0.9.1/24
+ ip ospf cost 1
+exit
+!
+interface port_NEWY
+ ip address 17.0.3.2/24
+ ip ospf cost 1
+exit
+!
+interface port_STLO
+ ip address 17.0.8.1/24
+ ip ospf cost 1
+exit
+!
+router bgp 17
+ neighbor 17.151.0.1 remote-as 17
+ neighbor 17.151.0.1 update-source lo
+ neighbor 17.152.0.1 remote-as 17
+ neighbor 17.152.0.1 update-source lo
+ neighbor 17.153.0.1 remote-as 17
+ neighbor 17.153.0.1 update-source lo
+ neighbor 17.155.0.1 remote-as 17
+ neighbor 17.155.0.1 update-source lo
+ neighbor 17.156.0.1 remote-as 17
+ neighbor 17.156.0.1 update-source lo
+ neighbor 17.157.0.1 remote-as 17
+ neighbor 17.157.0.1 update-source lo
+ neighbor 17.158.0.1 remote-as 17
+ neighbor 17.158.0.1 update-source lo
+ !
+ address-family ipv4 unicast
+  network 17.0.0.0/8
+  neighbor 17.151.0.1 next-hop-self
+  neighbor 17.152.0.1 next-hop-self
+  neighbor 17.153.0.1 next-hop-self
+  neighbor 17.155.0.1 next-hop-self
+  neighbor 17.156.0.1 next-hop-self
+  neighbor 17.157.0.1 next-hop-self
+  neighbor 17.158.0.1 next-hop-self
+ exit-address-family
+exit
+!
+router ospf
+ ospf router-id 17.154.0.1
+ network 17.0.3.0/24 area 0
+ network 17.0.5.0/24 area 0
+ network 17.0.7.0/24 area 0
+ network 17.0.8.0/24 area 0
+ network 17.0.9.0/24 area 0
+ network 17.104.0.0/24 area 0
+ network 17.154.0.0/24 area 0
+exit
+!
+ip prefix-list OWN_PREFIX seq 5 permit 17.0.0.0/8
+!
+route-map OWN_PREFIX permit 10
+ match ip address prefix-list OWN_PREFIX
+exit
+!
+end
